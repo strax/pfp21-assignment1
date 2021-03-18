@@ -15,7 +15,6 @@
 
 template <std::semiregular T>
 struct MemoryMappedFile {
-    typename iterator = std::span<T>;
 
 private:
     std::span<T> _span;
@@ -24,8 +23,6 @@ public:
     explicit MemoryMappedFile(std::filesystem::path &path);
 
     const T& operator[](int index) const;
-
-    std::input_iterator<T> begin();
 
     [[nodiscard]] size_t size() const noexcept;
 
@@ -56,19 +53,17 @@ MemoryMappedFile<T>::MemoryMappedFile(std::filesystem::path &path) {
     if (dest == (void*)-1) {
         throw std::runtime_error(strerror(errno));
     }
-    _span = std::span<T>(reinterpret_cast<T*>(dest), size);
+    _span = std::span<T>(reinterpret_cast<T*>(dest), size / sizeof(T));
 }
 
 template<std::semiregular T>
 MemoryMappedFile<T>::~MemoryMappedFile() {
-    munmap(_span.data(), _span.size_bytes());
+    munmap(reinterpret_cast<void*>(_span.data()), _span.size_bytes());
 }
 
 template<std::semiregular T>
 const T &MemoryMappedFile<T>::operator[](int index) const {
-    if (index >= size()) {
-        throw std::out_of_range("Index out of range: " + std::to_string(index) + ", size = " + std::to_string(size()));
-    }
+    assert(index < size());
     return _span[index];
 }
 

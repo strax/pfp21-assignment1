@@ -1,11 +1,12 @@
 #include <iostream>
+#include <fstream>
 #include <iterator>
 #include <filesystem>
 #include <sysexits.h>
+#include <functional>
 
 #include "MemoryMappedFile.h"
 #include "VByte.h"
-#include <ranges>
 
 constexpr auto PROGRAM_NAME = "vbyteenc";
 
@@ -16,14 +17,15 @@ int main(int argc, char** argv) {
     }
 
     try {
-        auto path = std::filesystem::path(argv[1]);
-        auto file = std::make_unique<MemoryMappedFile<uint64_t>>(path);
-        static_assert(std::input_or_output_iterator<MemoryMappedFile<uint64_t>>);
-        std::cout << "File contents: " << file->size() << " elements" << std::endl;
-        std::cout << (*file)[0] << std::endl;
-        std::cout << (*file)[1] << std::endl;
-        std::cout << (*file)[2] << std::endl;
-        std::cout << (*file)[3] << std::endl;
+        std::filesystem::path inpath(argv[1]);
+        auto infile = std::make_unique<MemoryMappedFile<uint64_t>>(inpath);
+        std::filesystem::path outpath(inpath);
+        outpath.replace_extension(outpath.extension().string() + ".vb");
+        std::ofstream ostream(outpath);
+        auto output = std::ostreambuf_iterator(ostream);
+        for (int i = 0; i < infile->size(); i++) {
+            VByteEncodeInteger(output, (*infile)[i]);
+        }
         return EX_OK;
     } catch (std::exception &err) {
         std::cerr << PROGRAM_NAME << ": " << err.what() << std::endl;

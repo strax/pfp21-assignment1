@@ -3,8 +3,8 @@
 #include <concepts>
 #include <iterator>
 
-template<std::integral T, std::output_iterator<std::byte> I>
-[[maybe_unused]] void VByteEncodeInteger(T i, I& output) {
+template<std::output_iterator<char> I, std::integral T>
+void VByteEncodeInteger(I& output, T i) {
     while (true) {
         T b = i % 128;
         if (i < 128) {

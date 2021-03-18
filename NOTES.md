@@ -1,4 +1,4 @@
-# 17.3.2021
+# 18.3.2021
 
 I started the assignment by thinking about what would be the most efficient way to read the input files.
 My first thought was to use streams as to keep memory usage low, as opposed to building a std::vector from the binary data.
@@ -15,3 +15,8 @@ I got a maybe a little excited and went straight to generics with the value type
 
 NOTE: I spent a hilarious amount of time fighting linker errors because of using templates in `MemoryMappedFile`.
 Turns out you just have to put everything in the header file and NOT have a `.cpp` file for the class.
+
+# 19.3.2021
+
+Tried to use `std::range` and `std::output_iterator` for the `MemoryMappedFile` class. Didn't work out so I just
+overloaded the subscript operator. First working version.
