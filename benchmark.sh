@@ -1,13 +1,24 @@
 #!/bin/bash
 set -eo pipefail
 
-BIN=./cmake-build-release/vbyteenc
+BINDIR=./cmake-build-release
 
 run-encode-bench() {
   for filename in files/*; do
-    $BIN "$filename"
+    "$BINDIR/vbyteenc" "$filename"
+  done
+}
+
+run-decode-bench() {
+  for filename in files/*.vb; do
+    "$BINDIR/vbytedec" "$filename"
   done
 }
 
 rm -f files/*.vb files/*.vb.dec
+echo "** vbyteenc **"
 time run-encode-bench
+echo ""
+
+echo "** vbytedec **"
+time run-decode-bench
