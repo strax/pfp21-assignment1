@@ -32,3 +32,5 @@ Turns out you just have to put everything in the header file and NOT have a `.cp
 
 Tried to use `std::range` and `std::output_iterator` for the `MemoryMappedFile` class. Didn't work out so I just
 overloaded the subscript operator. First working version.
+
+##
