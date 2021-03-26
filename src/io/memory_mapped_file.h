@@ -45,7 +45,7 @@ namespace io {
             close(fd);
             // Advise the kernel that the mapped area will be accessed in the near future
             madvise(dest, size, MADV_WILLNEED);
-            if (dest == (void*)-1) {
+            if (dest == MAP_FAILED) {
                 throw std::runtime_error(strerror(errno));
             }
             _span = std::span<T>(static_cast<T*>(dest), size / sizeof(T));

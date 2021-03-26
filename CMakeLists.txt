@@ -10,6 +10,8 @@ add_executable(vbyteenc src/vbyteenc.cpp src/io/memory_mapped_file.h src/vbyte.h
 add_executable(vbytedec src/vbytedec.cpp src/io/memory_mapped_file.h src/vbyte.h)
 add_executable(vbyteencsorted src/vbyteencsorted.cpp src/io/memory_mapped_file.h src/vbyte.h)
 add_executable(vbytedump src/vbytedump.cpp src/io/memory_mapped_file.h src/vbyte.h)
+add_executable(proximityintersection src/proximityintersection.cpp)
+add_executable(vbinfo src/vbinfo.cpp src/io/memory_mapped_file.h src/vbyte.h)
 
 include_directories(
         ${PROJECT_SOURCE_DIR}/src
