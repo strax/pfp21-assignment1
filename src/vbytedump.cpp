@@ -3,12 +3,10 @@
 #include <iterator>
 #include <filesystem>
 #include <sysexits.h>
-#include <functional>
 
-#include "io/memory_mapped_file.h"
 #include "vbyte.h"
 
-constexpr auto PROGRAM_NAME = "vbytedec";
+constexpr auto PROGRAM_NAME = "vbytedump";
 
 int main(int argc, char** argv) {
     if (argc < 2) {
@@ -21,16 +19,11 @@ int main(int argc, char** argv) {
         std::ifstream istream(inpath, std::ios::in | std::ios::binary);
         auto input = std::istreambuf_iterator(istream);
 
-        std::filesystem::path outpath(inpath);
-        outpath.replace_extension(outpath.extension().string() + ".dec");
-        std::ofstream ostream(outpath, std::ios::out | std::ios::binary);
         while (input != std::istreambuf_iterator<char>()) {
             uint64_t decoded = vbyte::decode(&input);
-            ostream.write((const char*) &decoded, sizeof(decoded));
+            std::cout << decoded << std::endl;
         }
-        ostream.flush();
         istream.close();
-        ostream.close();
         return EX_OK;
     } catch (std::exception &err) {
         std::cerr << PROGRAM_NAME << ": " << err.what() << std::endl;

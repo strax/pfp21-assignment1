@@ -3,10 +3,12 @@
 #include <iterator>
 #include <filesystem>
 #include <sysexits.h>
-#include <functional>
+#include <bit>
 
-#include "MemoryMappedFile.h"
-#include "VByte.h"
+#include "io/memory_mapped_file.h"
+#include "vbyte.h"
+
+static_assert(std::endian::native == std::endian::little, "Big-endian systems are not currently supported");
 
 constexpr auto PROGRAM_NAME = "vbyteenc";
 
@@ -18,13 +20,13 @@ int main(int argc, char** argv) {
 
     try {
         std::filesystem::path inpath(argv[1]);
-        auto infile = std::make_unique<MemoryMappedFile<uint64_t>>(inpath);
+        io::memory_mapped_file<uint64_t> infile(inpath);
         std::filesystem::path outpath(inpath);
         outpath.replace_extension(outpath.extension().string() + ".vb");
         std::ofstream ostream(outpath, std::ios::out | std::ios::binary);
         auto output = std::ostreambuf_iterator(ostream);
-        for (const auto &n : *infile) {
-            VByteEncodeInteger(output, n);
+        for (const auto &n : infile) {
+            vbyte::encode(&output, n);
         }
         return EX_OK;
     } catch (std::exception &err) {
