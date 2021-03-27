@@ -30,50 +30,36 @@ auto read_index_file(fs::path& path) {
     return pairs;
 }
 
+
 /// Performs proximity intersection on the given two sets \a as and \a bs with radius \a radius.
 /// Note that \a as is passed by value since it is sorted in-place whereas \a bs is passed as a const reference.
 /// This way the caller can decide whether to move \a as to this function or copy the vector beforehand.
 /// We use \a std::vector instead of \a std::unordered_set because vectors can be represented as contiguous memory blocks.
-std::vector<uint64_t> proximity_intersection(uint64_t radius, std::vector<uint64_t> as, const std::vector<uint64_t> &bs) {
-    std::ranges::sort(as);
-    std::cerr << "proximity_intersection: sorted as" << std::endl;
+std::vector<uint64_t> proximity_intersection(uint64_t radius, const std::vector<uint64_t> &as, const std::vector<uint64_t> &bs) {
     std::vector<uint64_t> matches;
-    // In the "worst" case, all elements are included in the intersection
-    matches.reserve(std::max(as.size(), bs.size()));
+    // In the "worst" case, all elements of `bs` are included in the set
+    matches.reserve(bs.size());
     for (const auto b : bs) {
         auto end = std::ranges::upper_bound(as, b + radius);
         auto begin = std::ranges::lower_bound(std::ranges::begin(as), end, b - radius);
         if (!std::ranges::empty(std::ranges::subrange(begin, end))) {
             matches.emplace_back(b);
         }
-//        for (const auto a : as) {
-//            uint64_t delta = (a > b) ? a - b : b - a;
-//            // If b is in range [a-z,a+z] then add it to results.
-//            // We can move on to the next element since this one has been added
-//            if (delta <= radius) {
-//                matches.emplace_back(b);
-//                break;
-//            }
-//            // Since `as` is sorted, we can stop iterating when we have exceeded the upper bound (a+z)
-//            // as at that point every remaining element in the sequence is guaranteed to be more than that
-//            else if (a > b + radius) {
-//                break;
-//            }
-//        }
     }
     matches.shrink_to_fit();
     return matches;
 }
 
-std::vector<uint64_t> read_compressed_set(fs::path path) {
+auto read_compressed_set(fs::path path) {
     io::memory_mapped_file file(path);
-    std::cerr << "file.size() == " << file.size() << std::endl;
     std::vector<uint64_t> result;
+    result.reserve(file.size());
     auto it = file.begin();
-    std::cerr << std::to_address(it) << " " << std::to_address(file.end()) << std::endl;
     while (it != file.end()) {
         result.emplace_back(vbyte::decode(&it));
     }
+    result.shrink_to_fit();
+    std::ranges::sort(result);
     return result;
 }
 
@@ -83,11 +69,20 @@ int main(int argc, char** argv) {
         exit(EX_USAGE);
     }
 
+    int radius;
     try {
-        int radius = std::stoi(std::string(argv[1]));
-        std::cerr << "radius: " << std::to_string(radius) << std::endl;
-        fs::path inpath(argv[2]);
+        radius = std::stoi(std::string(argv[1]));
+    } catch (std::invalid_argument &ex) {
+        std::cerr << PROGRAM_NAME << ": radius must be a number" << std::endl;
+        exit(EX_USAGE);
+    } catch (std::exception &ex) {
+        std::cerr << PROGRAM_NAME << ex.what() << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
+    fs::path inpath(argv[2]);
+
+    try {
         auto pairs = read_index_file(inpath);
         auto start_time = std::chrono::steady_clock::now();
         std::vector<size_t> sizes;
@@ -107,7 +102,7 @@ int main(int argc, char** argv) {
             std::cout << size << std::endl;
         }
         std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - start_time;
-        std::cout << "Total duration: " << elapsed << "ms" << std::endl;
+        std::cout << "Total duration: " << elapsed.count() << "ms" << std::endl;
         return EX_OK;
     } catch (std::exception &ex) {
         std::cerr << PROGRAM_NAME << ": " << ex.what() << std::endl;
