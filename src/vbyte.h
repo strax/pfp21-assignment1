@@ -24,11 +24,11 @@ namespace vbyte {
         uint64_t p = 1;
         while (true) {
             uint8_t b;
-            auto c = **input++;
-            if constexpr (std::is_same<decltype(c), std::byte>::value) {
-                b = std::to_integer<uint8_t>(c);
+            auto c = (*input)++;
+            if constexpr (std::is_same<decltype(*c), std::byte>::value) {
+                b = std::to_integer<uint8_t>(*c);
             } else {
-                b = static_cast<uint8_t>(c);
+                b = static_cast<uint8_t>(*c);
             }
             if (b >= 128) {
                 i += (b - 128) * p;
@@ -39,11 +39,4 @@ namespace vbyte {
         }
         return i;
     }
-
-    struct decoder {
-        explicit decoder(std::ranges::input_range auto &&range) {
-            auto begin = std::ranges::begin(range);
-            auto end = std::ranges::end(range);
-        }
-    };
 }

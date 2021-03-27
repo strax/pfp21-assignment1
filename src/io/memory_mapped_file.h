@@ -10,6 +10,7 @@
 #include <cassert>
 #include <ranges>
 #include <span>
+#include <iostream>
 
 #if defined(__unix__) || defined(__APPLE__)
     #include <sys/mman.h>
@@ -40,6 +41,7 @@ namespace io {
                 throw std::runtime_error(message);
             }
             auto size = s.st_size;
+            std::cerr << "memory_mapped_file: file size: " << size << " bytes" << std::endl;
             // The file size must be a multiple of the type we want in order to be valid
             if (size % sizeof(T) != 0) {
                 throw std::runtime_error(path.string() + ": invalid file size");
