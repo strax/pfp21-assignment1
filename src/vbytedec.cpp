@@ -29,8 +29,6 @@ int main(int argc, char** argv) {
             ostream.write((const char*) &decoded, sizeof(decoded));
         }
         ostream.flush();
-        istream.close();
-        ostream.close();
         return EX_OK;
     } catch (std::exception &err) {
         std::cerr << PROGRAM_NAME << ": " << err.what() << std::endl;

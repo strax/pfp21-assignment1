@@ -4,14 +4,19 @@
 #include <filesystem>
 #include <string>
 #include <filesystem>
-#include <sys/mman.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <cstring>
 #include <cassert>
 #include <ranges>
 #include <span>
+
+#if defined(__unix__) || defined(__APPLE__)
+    #include <sys/mman.h>
+    #include <sys/stat.h>
+#else
+    #error "Unsupported platform"
+#endif
 
 namespace io {
     template <typename T = std::byte>

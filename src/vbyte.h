@@ -39,4 +39,11 @@ namespace vbyte {
         }
         return i;
     }
+
+    struct decoder {
+        explicit decoder(std::ranges::input_range auto &&range) {
+            auto begin = std::ranges::begin(range);
+            auto end = std::ranges::end(range);
+        }
+    };
 }
