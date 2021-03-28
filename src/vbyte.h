@@ -10,10 +10,10 @@ namespace vbyte {
         while (true) {
             uint64_t b = i % 128;
             if (i < 128) {
-                *output++ = b + 128;
+                (*output)++ = b + 128;
                 break;
             }
-            *output++ = b;
+            (*output)++ = b;
             i = i / 128;
         }
     }
