@@ -37,7 +37,8 @@ auto read_index_file(fs::path& path) {
 /// We use \a std::vector instead of \a std::unordered_set because vectors can be represented as contiguous memory blocks.
 std::vector<uint64_t> proximity_intersection(uint64_t radius, const std::vector<uint64_t> &as, const std::vector<uint64_t> &bs) {
     std::vector<uint64_t> matches;
-    // In the "worst" case, all elements of `bs` are included in the set
+    // In the "worst" case, all elements of `bs` are included in the set, reserving it upfront and
+    // shrinking the vector afterwards should be faster than possibly multiple allocations within the loop.
     matches.reserve(bs.size());
     for (const auto b : bs) {
         auto end = std::ranges::upper_bound(as, b + radius);
@@ -53,6 +54,8 @@ std::vector<uint64_t> proximity_intersection(uint64_t radius, const std::vector<
 auto read_compressed_set(fs::path path) {
     io::memory_mapped_file file(path);
     std::vector<uint64_t> result;
+    // As vbyte-encoded values are one byte at minimum, the theoretical maximum count of values is
+    // equal to the length of the compressed file.
     result.reserve(file.size());
     auto it = file.begin();
     while (it != file.end()) {
