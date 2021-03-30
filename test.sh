@@ -9,7 +9,7 @@ for filename in files/*; do
 done
 
 echo -n "Testing checksums..."
-if shasum -s -a 512 -c checksums.encoded.txt; then
+if sha512sum --quiet --check checksums.encoded.txt; then
   echo " OK"
 else
   echo " FAIL"
@@ -22,7 +22,7 @@ for filename in files/*.vb; do
 done
 
 echo -n "Testing checksums for decoded files..."
-if shasum -s -a 512 -c checksums.decoded.txt; then
+if sha512sum --quiet --check checksums.decoded.txt; then
   echo " OK"
 else
   echo " FAIL"
@@ -30,7 +30,7 @@ else
 fi
 
 echo -n "Check that input files have not changed..."
-if shasum -s -a 512 -c checksums.inputs.txt; then
+if sha512sum --quiet --check checksums.inputs.txt; then
   echo " OK"
 else
   echo " FAIL"
