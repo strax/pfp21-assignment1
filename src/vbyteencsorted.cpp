@@ -8,12 +8,11 @@
 
 #include "io/memory_mapped_file.h"
 #include "vbyte.h"
-
-constexpr auto PROGRAM_NAME = "vbyteencsorted";
+#include "utils.h"
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        std::cerr << "usage: " << argv[0] << " filename" << std::endl;
+        fprintf(stderr, "usage: %s file\n", getprogname());
         exit(EX_USAGE);
     }
 
@@ -40,7 +39,7 @@ int main(int argc, char** argv) {
         ostream.close();
         return EX_OK;
     } catch (std::exception &err) {
-        std::cerr << PROGRAM_NAME << ": " << err.what() << std::endl;
+        error(err);
         exit(EXIT_FAILURE);
     }
 }

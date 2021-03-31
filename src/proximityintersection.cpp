@@ -10,12 +10,11 @@
 
 #include "io/memory_mapped_file.h"
 #include "vbyte.h"
+#include "utils.h"
 
 namespace fs = std::filesystem;
 
 static_assert(std::endian::native == std::endian::little, "Big-endian systems are not currently supported");
-
-constexpr auto PROGRAM_NAME = "proximityintersection";
 
 auto read_index_file(fs::path& path) {
     if (!fs::exists(path)) {
@@ -68,18 +67,18 @@ auto read_compressed_set(fs::path path) {
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        std::cerr << "usage: " << argv[0] << " <radius> <filename>" << std::endl;
-        exit(EX_USAGE);
+        fprintf(stderr, "usage: %s radius filename");
+        exit(EXIT_FAILURE);
     }
 
     int radius;
     try {
-        radius = std::stoi(std::string(argv[1]));
+        radius = std::stoi(argv[1]);
     } catch (std::invalid_argument &ex) {
-        std::cerr << PROGRAM_NAME << ": radius must be a number" << std::endl;
-        exit(EX_USAGE);
+        error("radius must be a number");
+        exit(EXIT_FAILURE);
     } catch (std::exception &ex) {
-        std::cerr << PROGRAM_NAME << ex.what() << std::endl;
+        error(ex);
         exit(EXIT_FAILURE);
     }
 
@@ -108,6 +107,7 @@ int main(int argc, char** argv) {
         std::cout << "Total duration: " << elapsed.count() << "ms" << std::endl;
         return EX_OK;
     } catch (std::exception &ex) {
-        std::cerr << PROGRAM_NAME << ": " << ex.what() << std::endl;
+        error(ex);
+        exit(EXIT_FAILURE);
     }
 }

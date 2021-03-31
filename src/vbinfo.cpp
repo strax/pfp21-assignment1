@@ -1,20 +1,18 @@
 #include <iostream>
 #include <ranges>
 #include <filesystem>
-#include <sysexits.h>
 #include <vector>
 #include <algorithm>
-#include "io/memory_mapped_file.h"
 #include <chrono>
 
+#include "io/memory_mapped_file.h"
 #include "vbyte.h"
-
-constexpr auto PROGRAM_NAME = "vbinfo";
+#include "utils.h"
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        std::cerr << "usage: " << argv[0] << " <filename>" << std::endl;
-        exit(EX_USAGE);
+        fprintf(stderr, "usage: %s file\n", getprogname());
+        exit(EXIT_FAILURE);
     }
 
     try {
@@ -43,9 +41,9 @@ int main(int argc, char** argv) {
         std::cout << "Maximum: " << *std::ranges::max_element(data) << std::endl;
         std::cout << "Parse time: " << parse_time.count() << "ms" << std::endl;
 
-        return EX_OK;
+        return EXIT_SUCCESS;
     } catch (std::exception &err) {
-        std::cerr << PROGRAM_NAME << ": " << err.what() << std::endl;
+        error(err);
         exit(EXIT_FAILURE);
     }
 }

@@ -2,18 +2,16 @@
 #include <fstream>
 #include <iterator>
 #include <filesystem>
-#include <sysexits.h>
 #include <functional>
 
 #include "io/memory_mapped_file.h"
 #include "vbyte.h"
-
-constexpr auto PROGRAM_NAME = "vbytedec";
+#include "utils.h"
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        std::cerr << "usage: " << argv[0] << " filename" << std::endl;
-        exit(EX_USAGE);
+        fprintf(stderr, "usage: %s file\n", getprogname());
+        exit(EXIT_FAILURE);
     }
 
     try {
@@ -29,9 +27,9 @@ int main(int argc, char** argv) {
             ostream.write((const char*) &decoded, sizeof(decoded));
         }
         ostream.flush();
-        return EX_OK;
+        return EXIT_SUCCESS;
     } catch (std::exception &err) {
-        std::cerr << PROGRAM_NAME << ": " << err.what() << std::endl;
+        error(err);
         exit(EXIT_FAILURE);
     }
 }

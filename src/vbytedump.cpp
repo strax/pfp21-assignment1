@@ -2,16 +2,17 @@
 #include <iterator>
 #include <filesystem>
 #include <sysexits.h>
+#include <err.h>
+#include <cstdio>
 
 #include "io/memory_mapped_file.h"
 #include "vbyte.h"
-
-constexpr auto PROGRAM_NAME = "vbytedump";
+#include "utils.h"
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        std::cerr << "usage: " << argv[0] << " filename" << std::endl;
-        exit(EX_USAGE);
+        fprintf(stderr, "usage: %s filename\n", getprogname());
+        exit(EXIT_FAILURE);
     }
 
     try {
@@ -25,7 +26,7 @@ int main(int argc, char** argv) {
         }
         return EX_OK;
     } catch (std::exception &err) {
-        std::cerr << PROGRAM_NAME << ": " << err.what() << std::endl;
+        error(err);
         exit(EXIT_FAILURE);
     }
 }
