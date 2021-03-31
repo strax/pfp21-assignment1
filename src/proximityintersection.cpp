@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iterator>
 #include <filesystem>
-#include <sysexits.h>
 #include <bit>
 #include <vector>
 #include <chrono>
@@ -105,7 +104,7 @@ int main(int argc, char** argv) {
         }
         std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - start_time;
         std::cout << "Total duration: " << elapsed.count() << "ms" << std::endl;
-        return EX_OK;
+        return EXIT_SUCCESS;
     } catch (std::exception &ex) {
         error(ex);
         exit(EXIT_FAILURE);

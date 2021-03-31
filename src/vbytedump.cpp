@@ -1,8 +1,6 @@
 #include <iostream>
 #include <iterator>
 #include <filesystem>
-#include <sysexits.h>
-#include <err.h>
 #include <cstdio>
 
 #include "io/memory_mapped_file.h"
@@ -24,7 +22,7 @@ int main(int argc, char** argv) {
             uint64_t decoded = vbyte::decode(&it);
             std::cout << decoded << std::endl;
         }
-        return EX_OK;
+        return EXIT_SUCCESS;
     } catch (std::exception &err) {
         error(err);
         exit(EXIT_FAILURE);

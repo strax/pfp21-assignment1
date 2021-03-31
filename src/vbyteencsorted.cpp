@@ -2,9 +2,7 @@
 #include <fstream>
 #include <iterator>
 #include <filesystem>
-#include <sysexits.h>
 #include <vector>
-#include <bit>
 
 #include "io/memory_mapped_file.h"
 #include "vbyte.h"
@@ -13,7 +11,7 @@
 int main(int argc, char** argv) {
     if (argc < 2) {
         fprintf(stderr, "usage: %s file\n", getprogname());
-        exit(EX_USAGE);
+        exit(EXIT_FAILURE);
     }
 
     try {
@@ -37,7 +35,7 @@ int main(int argc, char** argv) {
         }
         ostream.flush();
         ostream.close();
-        return EX_OK;
+        return EXIT_SUCCESS;
     } catch (std::exception &err) {
         error(err);
         exit(EXIT_FAILURE);

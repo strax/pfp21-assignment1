@@ -1,5 +1,4 @@
 #include <iostream>
-#include <ranges>
 #include <filesystem>
 #include <vector>
 #include <algorithm>
