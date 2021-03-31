@@ -66,7 +66,7 @@ auto read_compressed_set(fs::path path) {
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        fprintf(stderr, "usage: %s radius filename");
+        fprintf(stderr, "usage: %s radius file\n", getprogname());
         exit(EXIT_FAILURE);
     }
 

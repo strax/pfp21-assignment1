@@ -9,7 +9,7 @@
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        fprintf(stderr, "usage: %s filename\n", getprogname());
+        fprintf(stderr, "usage: %s file\n", getprogname());
         exit(EXIT_FAILURE);
     }
 
