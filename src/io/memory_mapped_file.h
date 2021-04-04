@@ -3,7 +3,6 @@
 #include <concepts>
 #include <filesystem>
 #include <string>
-#include <filesystem>
 #include <unistd.h>
 #include <fcntl.h>
 #include <cstring>
@@ -11,6 +10,9 @@
 #include <ranges>
 #include <span>
 #include <iostream>
+#include <cerrno>
+
+#include "error.h"
 
 #if defined(__unix__) || defined(__APPLE__)
     #include <sys/mman.h>
@@ -18,6 +20,8 @@
 #else
     #error "Unsupported platform"
 #endif
+
+namespace fs = std::filesystem;
 
 namespace io {
     template <typename T = std::byte>
@@ -28,17 +32,15 @@ namespace io {
         std::span<T> _span;
 
     public:
-        explicit memory_mapped_file(std::filesystem::path &path) {
+        explicit memory_mapped_file(fs::path &path) {
             auto fd = open(path.c_str(), O_RDONLY);
             if (fd == -1) {
-                auto emsg = path.string() + ": " + strerror(errno);
-                throw std::runtime_error(emsg);
+                throw io_error(errno, path);
             }
             // mmap requires file length
             struct stat s {};
             if (stat(path.c_str(), &s) == -1) {
-                auto message = path.string() + ": " + strerror(errno);
-                throw std::runtime_error(message);
+                throw io_error(errno, path);
             }
             auto size = s.st_size;
             // The file size must be a multiple of the type we want in order to be valid
