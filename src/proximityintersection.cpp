@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
             auto set_b_filename = fs::path("F" + std::to_string(pair.second) + ".vb");
             auto set_a = read_compressed_set(files_path / set_a_filename);
             auto set_b = read_compressed_set(files_path / set_b_filename);
-            auto result = proximity_intersection(radius, std::move(set_a), set_b);
+            auto result = proximity_intersection(radius, set_a, set_b);
             sizes.emplace_back(result.size());
         }
         for (const auto size : sizes) {
