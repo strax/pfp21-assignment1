@@ -26,7 +26,7 @@ namespace io {
     class file {
     public:
         file(path p, mode m): path_(std::move(p)), mode_(m), write_buffer_(buffer(page_size)) {
-            fd_ = open(path_.c_str(), mode_ == mode::write ? O_RDWR | O_CREAT | O_TRUNC : O_RDONLY);
+            fd_ = open(path_.c_str(), mode_ == mode::write ? O_RDWR | O_CREAT | O_TRUNC : O_RDONLY, S_IRWXU | S_IRWXG | S_IRWXO);
             if (!fd_) {
                 throw io_error(errno, path_);
             }
