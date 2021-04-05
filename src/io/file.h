@@ -63,6 +63,7 @@ namespace io {
         }
 
         ~file() noexcept {
+            commit();
             close(fd_);
         }
 
@@ -73,11 +74,13 @@ namespace io {
         buffer write_buffer_;
 
         void commit() {
-            auto written = ::write(fd_, static_cast<const void*>(write_buffer_.data()), write_buffer_.size());
-            if (written < 0) {
-                throw io_error(errno, path_);
+            if (write_buffer_.size() > 0) {
+                auto written = ::write(fd_, static_cast<const void *>(write_buffer_.data()), write_buffer_.size());
+                if (written < 0) {
+                    throw io_error(errno, path_);
+                }
+                write_buffer_.reset();
             }
-            write_buffer_.reset();
         }
     };
 }
