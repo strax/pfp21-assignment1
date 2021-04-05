@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <cstdio>
+#include <unistd.h>
 
 #if defined(__APPLE__) || defined(__FreeBSD__)
 extern "C" const char* getprogname();
@@ -17,4 +18,8 @@ void error(const char* message) {
 
 void error(std::exception &exception) {
     error(exception.what());
+}
+
+inline size_t system_page_size() noexcept {
+    return sysconf(_SC_PAGESIZE);
 }

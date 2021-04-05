@@ -3,7 +3,6 @@
 #include <iterator>
 #include <filesystem>
 #include <bit>
-#include <array>
 
 #include "io/memory_mapped_file.h"
 #include "io/file.h"
@@ -17,7 +16,6 @@ int main(int argc, char** argv) {
 
     if (argc < 2) {
         std::cerr << "usage: " << getprogname() << " file\n";
-        std::cerr << "page size: " << system_page_size() << "\n";
         exit(EXIT_FAILURE);
     }
 
@@ -27,18 +25,11 @@ int main(int argc, char** argv) {
         outpath.replace_extension(outpath.extension().string() + ".vb");
 
         io::memory_mapped_file<uint64_t> infile(inpath);
-        io::file outfile(outpath, io::mode::write);
-        std::vector<std::byte> buffer;
-        buffer.reserve(io::page_size * 3);
-        auto output = std::back_inserter(buffer);
+        std::ofstream ostream(outpath, std::ios::out | std::ios::binary);
+        auto output = std::ostreambuf_iterator(ostream);
         for (const auto &n : infile) {
             vbyte::encode(&output, n);
-            if (buffer.size() >= (io::page_size * 2)) {
-                outfile.write(std::span{buffer.data(), buffer.size()});
-                buffer.clear();
-            }
         }
-        outfile.write(buffer);
         return EXIT_SUCCESS;
     } catch (std::exception &err) {
         error(err);

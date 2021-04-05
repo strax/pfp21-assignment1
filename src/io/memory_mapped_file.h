@@ -52,7 +52,7 @@ namespace io {
             // The file descriptor can be closed immediately after the memory has been mapped
             close(fd);
             // Advise the kernel that the mapped area will be accessed in the near future
-            madvise(dest, size, MADV_WILLNEED);
+            madvise(dest, size, MADV_SEQUENTIAL);
             if (dest == MAP_FAILED) {
                 throw std::runtime_error(strerror(errno));
             }

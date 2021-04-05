@@ -7,22 +7,19 @@
 #include <vector>
 
 namespace vbyte {
-    std::vector<std::byte> encode(uint64_t i) {
-        std::vector<std::byte> output;
+    void encode(std::output_iterator<std::byte> auto&& output, uint64_t i) {
         while (true) {
             uint8_t b = i % 128;
             if (i < 128) {
-                output.emplace_back(std::byte(b + 128));
+                (*output)++ = std::byte(b + 128);
                 break;
             }
-            output.emplace_back(std::byte(b));
+            (*output)++ = std::byte{b};
             i = i / 128;
         }
-        output.shrink_to_fit();
-        return output;
     }
 
-    void encode(std::output_iterator<uint8_t> auto && output, uint64_t i) {
+    void encode(std::output_iterator<uint8_t> auto&& output, uint64_t i) {
         while (true) {
             uint64_t b = i % 128;
             if (i < 128) {
