@@ -27,6 +27,7 @@ int main(int argc, char** argv) {
         outpath.replace_extension(outpath.extension().string() + ".vb");
 
         io::memory_mapped_file<uint64_t> infile(inpath);
+        infile.advise(io::advise::sequential);
         io::file outfile(outpath, io::mode::write);
         std::vector<std::byte> buffer;
         buffer.reserve(io::page_size * 3);

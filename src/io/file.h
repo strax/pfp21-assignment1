@@ -28,9 +28,10 @@ namespace io {
         file(path p, mode m): path_(std::move(p)), mode_(m), write_buffer_(buffer(page_size)) {
             // Open a new file descriptor in either read-only mode (O_RDONLY) or read-write mode (O_RDWR) depending on
             // `mode`. If `mode` is write, the file is emptied (O_TRUNC) on opening, and if it does not exist, it is created
-            // (O_CREAT). The flags `S_IRWXU | S_IRWXG | S_IRWXO` correspond to file permissions 777, because the current
-            // user's umask will be substracted from the effective permissions, resulting in a "default" permission set.
-            fd_ = open(path_.c_str(), mode_ == mode::write ? O_RDWR | O_CREAT | O_TRUNC : O_RDONLY, S_IR);
+            // (O_CREAT).
+            // The permissions for a created file correspond to the default permissions used by `touch`, see
+            // https://pubs.opengroup.org/onlinepubs/9699919799/utilities/touch.html
+            fd_ = open(path_.c_str(), mode_ == mode::write ? O_RDWR | O_CREAT | O_TRUNC : O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
             if (!fd_) {
                 throw io_error(errno, path_);
             }

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "io/memory_mapped_file.h"
+#include "io/file.h"
 #include "vbyte.h"
 #include "utils.h"
 
@@ -24,17 +25,22 @@ int main(int argc, char** argv) {
         std::sort(inputs.begin(), inputs.end());
 
         outpath.replace_extension(outpath.extension().string() + ".sorted.vb");
-        std::ofstream ostream(outpath, std::ios::out | std::ios::binary);
-        auto output = std::ostreambuf_iterator(ostream);
+        io::file outfile(outpath, io::mode::write);
 
         uint64_t previous = 0;
-        for (const auto &n : inputs) {
+        std::vector<std::byte> buffer;
+        buffer.reserve(io::page_size * 3);
+        auto output = std::back_inserter(buffer);
+        for (const auto &n : infile) {
             uint64_t delta = n - previous;
             previous = n;
             vbyte::encode(&output, delta);
+            if (buffer.size() >= (io::page_size * 2)) {
+                outfile.write(std::span{buffer.data(), buffer.size()});
+                buffer.clear();
+            }
         }
-        ostream.flush();
-        ostream.close();
+        outfile.write(buffer);
         return EXIT_SUCCESS;
     } catch (std::exception &err) {
         error(err);

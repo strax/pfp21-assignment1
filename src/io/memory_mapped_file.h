@@ -24,6 +24,14 @@
 namespace fs = std::filesystem;
 
 namespace io {
+    enum class advise : int {
+        normal = MADV_NORMAL,
+        sequential = MADV_SEQUENTIAL,
+        random = MADV_RANDOM,
+        willneed = MADV_WILLNEED,
+        dontneed = MADV_DONTNEED
+    };
+
     template <typename T = std::byte>
     requires(std::is_fundamental<T>::value || std::is_same<T, std::byte>::value)
     struct memory_mapped_file {
@@ -51,8 +59,6 @@ namespace io {
             void* dest = mmap(nullptr, size, PROT_READ, MAP_SHARED, fd, 0);
             // The file descriptor can be closed immediately after the memory has been mapped
             close(fd);
-            // Advise the kernel that the mapped area will be accessed in the near future
-            madvise(dest, size, MADV_SEQUENTIAL);
             if (dest == MAP_FAILED) {
                 throw std::runtime_error(strerror(errno));
             }
@@ -62,6 +68,10 @@ namespace io {
         constexpr T& operator[](int index) const {
             assert(index < size());
             return _span[index];
+        }
+
+        void advise(advise adv) {
+            madvise(static_cast<void*>(_span.data()), _span.size_bytes(), static_cast<int>(adv));
         }
 
         [[nodiscard]] constexpr auto size() const noexcept {
