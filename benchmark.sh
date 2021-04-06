@@ -1,24 +1,17 @@
 #!/bin/bash
 set -eo pipefail
 
-BINDIR=./cmake-build-release
-
-run-encode-bench() {
-  for filename in files/*; do
-    "$BINDIR/vbyteenc" "$filename"
-  done
-}
-
-run-decode-bench() {
-  for filename in files/*.vb; do
-    "$BINDIR/vbytedec" "$filename"
-  done
-}
+export BINDIR=./cmake-build-release
 
 rm -f files/*.vb files/*.vb.dec
 echo "** vbyteenc **"
-time run-encode-bench
+env time -v ./bench/bench-vbyteenc.sh
 echo ""
 
 echo "** vbytedec **"
-time run-decode-bench
+env time -v ./bench/bench-vbytedec.sh
+echo ""
+
+rm -f files/*.vb files/*.vb.dec
+echo "** vbyteencsorted **"
+env time -v ./bench/bench-vbyteencsorted.sh
