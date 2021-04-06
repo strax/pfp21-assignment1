@@ -26,7 +26,11 @@ namespace io {
     class file {
     public:
         file(path p, mode m): path_(std::move(p)), mode_(m), write_buffer_(buffer(page_size)) {
-            fd_ = open(path_.c_str(), mode_ == mode::write ? O_RDWR | O_CREAT | O_TRUNC : O_RDONLY, S_IRWXU | S_IRWXG | S_IRWXO);
+            // Open a new file descriptor in either read-only mode (O_RDONLY) or read-write mode (O_RDWR) depending on
+            // `mode`. If `mode` is write, the file is emptied (O_TRUNC) on opening, and if it does not exist, it is created
+            // (O_CREAT). The flags `S_IRWXU | S_IRWXG | S_IRWXO` correspond to file permissions 777, because the current
+            // user's umask will be substracted from the effective permissions, resulting in a "default" permission set.
+            fd_ = open(path_.c_str(), mode_ == mode::write ? O_RDWR | O_CREAT | O_TRUNC : O_RDONLY, S_IR);
             if (!fd_) {
                 throw io_error(errno, path_);
             }
