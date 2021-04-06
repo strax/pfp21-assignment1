@@ -20,6 +20,4 @@ void error(std::exception &exception) {
     error(exception.what());
 }
 
-inline size_t system_page_size() noexcept {
-    return sysconf(_SC_PAGESIZE);
-}
+static size_t pagesize = sysconf(_SC_PAGESIZE);

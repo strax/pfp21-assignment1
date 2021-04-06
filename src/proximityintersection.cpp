@@ -17,7 +17,7 @@ static_assert(std::endian::native == std::endian::little, "Big-endian systems ar
 
 auto read_index_file(fs::path& path) {
     if (!fs::exists(path)) {
-        throw std::runtime_error(path.string() + ": no such file");
+        throw std::runtime_error(path.string() + ": no such file_writer");
     }
     std::ifstream file(path, std::ios::in);
     std::vector<std::pair<uint16_t, uint16_t>> pairs;
@@ -53,7 +53,7 @@ auto read_compressed_set(fs::path path) {
     io::memory_mapped_file file(path);
     std::vector<uint64_t> result;
     // As vbyte-encoded values are one byte at minimum, the theoretical maximum count of values is
-    // equal to the length of the compressed file.
+    // equal to the length of the compressed file_writer.
     result.reserve(file.size());
     auto it = file.begin();
     while (it != file.end()) {
@@ -66,7 +66,7 @@ auto read_compressed_set(fs::path path) {
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        fprintf(stderr, "usage: %s radius file\n", getprogname());
+        fprintf(stderr, "usage: %s radius file_writer\n", getprogname());
         exit(EXIT_FAILURE);
     }
 

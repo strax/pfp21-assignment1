@@ -5,7 +5,7 @@
 #include <bit>
 
 #include "io/memory_mapped_file.h"
-#include "io/file.h"
+#include "io/file_writer.h"
 #include "vbyte.h"
 #include "utils.h"
 
@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     std::ios_base::sync_with_stdio(false);
 
     if (argc < 2) {
-        std::cerr << "usage: " << getprogname() << " file\n";
+        std::cerr << "usage: " << getprogname() << " file_writer\n";
         exit(EXIT_FAILURE);
     }
 

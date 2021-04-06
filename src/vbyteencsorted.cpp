@@ -5,13 +5,13 @@
 #include <vector>
 
 #include "io/memory_mapped_file.h"
-#include "io/file.h"
+#include "io/file_writer.h"
 #include "vbyte.h"
 #include "utils.h"
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        fprintf(stderr, "usage: %s file\n", getprogname());
+        fprintf(stderr, "usage: %s file_writer\n", getprogname());
         exit(EXIT_FAILURE);
     }
 
@@ -25,22 +25,15 @@ int main(int argc, char** argv) {
         std::sort(inputs.begin(), inputs.end());
 
         outpath.replace_extension(outpath.extension().string() + ".sorted.vb");
-        io::file outfile(outpath, io::mode::write);
+        io::file_writer outfile(outpath);
 
         uint64_t previous = 0;
-        std::vector<std::byte> buffer;
-        buffer.reserve(io::page_size * 3);
-        auto output = std::back_inserter(buffer);
+        auto output = outfile.begin();
         for (const auto &n : infile) {
             uint64_t delta = n - previous;
             previous = n;
             vbyte::encode(&output, delta);
-            if (buffer.size() >= (io::page_size * 2)) {
-                outfile.write(std::span{buffer.data(), buffer.size()});
-                buffer.clear();
-            }
         }
-        outfile.write(buffer);
         return EXIT_SUCCESS;
     } catch (std::exception &err) {
         error(err);

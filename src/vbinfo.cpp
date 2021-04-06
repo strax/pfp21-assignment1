@@ -10,7 +10,7 @@
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        fprintf(stderr, "usage: %s file\n", getprogname());
+        fprintf(stderr, "usage: %s file_writer\n", getprogname());
         exit(EXIT_FAILURE);
     }
 
