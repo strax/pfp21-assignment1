@@ -60,10 +60,21 @@ namespace io {
             //
             // The permissions for the created file_writer correspond to the default permissions used by `touch`, see
             // https://pubs.opengroup.org/onlinepubs/9699919799/utilities/touch.html
-            fd_ = open(path_.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_EXLOCK, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+            auto oflags = O_WRONLY | O_CREAT | O_TRUNC;
+#ifdef __APPLE__
+            // O_EXLOCK does not exist on Linux
+            oflags |= O_EXLOCK;
+#endif
+            fd_ = open(path_.c_str(), oflags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
             if (!fd_) {
                 throw io_error(errno, path_);
             }
+#ifdef __linux__
+            // Lock the file explicitly since we did not set O_EXLOCK
+            if (!flock(fd_, LOCK_EX)) {
+                throw io_error(errno, path_);
+            }
+#endif
         }
 
         void write(std::span<const std::byte> span) {
