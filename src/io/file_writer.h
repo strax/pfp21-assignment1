@@ -60,7 +60,7 @@ namespace io {
             //
             // The permissions for the created file_writer correspond to the default permissions used by `touch`, see
             // https://pubs.opengroup.org/onlinepubs/9699919799/utilities/touch.html
-            fd_ = open(path_.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_EXLOCK | O_SHLOCK, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+            fd_ = open(path_.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_EXLOCK, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
             if (!fd_) {
                 throw io_error(errno, path_);
             }
