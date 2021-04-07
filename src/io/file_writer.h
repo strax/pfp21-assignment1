@@ -8,6 +8,9 @@
 #include <unistd.h>
 #include <sys/uio.h>
 #include <fcntl.h>
+#ifdef __linux__
+#include <sys/file.h>
+#endif
 
 #include "error.h"
 #include "byte_buffer.h"
