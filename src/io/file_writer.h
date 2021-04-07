@@ -71,7 +71,8 @@ namespace io {
             }
 #ifdef __linux__
             // Lock the file explicitly since we did not set O_EXLOCK
-            if (!flock(fd_, LOCK_EX)) {
+            auto flock_status = flock(fd_, LOCK_EX);
+            if (!flock_status) {
                 throw io_error(errno, path_);
             }
 #endif
