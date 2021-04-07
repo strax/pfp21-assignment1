@@ -43,12 +43,12 @@ namespace io {
         explicit memory_mapped_file(fs::path &path) {
             auto fd = open(path.c_str(), O_RDONLY);
             if (fd == -1) {
-                throw io_error(errno, path);
+                throw io_error("open", errno, path);
             }
             // mmap requires file_writer length
             struct stat s {};
             if (stat(path.c_str(), &s) == -1) {
-                throw io_error(errno, path);
+                throw io_error("stat", errno, path);
             }
             auto size = s.st_size;
             // The file_writer size must be a multiple of the type we want in order to be valid
@@ -60,7 +60,7 @@ namespace io {
             // The file_writer descriptor can be closed immediately after the memory has been mapped
             close(fd);
             if (dest == MAP_FAILED) {
-                throw std::runtime_error(strerror(errno));
+                throw io_error("mmap", errno, path);
             }
             _span = std::span<T>(static_cast<T*>(dest), size / sizeof(T));
         }

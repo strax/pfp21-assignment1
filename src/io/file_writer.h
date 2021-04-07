@@ -70,13 +70,13 @@ namespace io {
 #endif
             fd_ = open(path_.c_str(), oflags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
             if (!fd_) {
-                throw io_error(errno, path_);
+                throw io_error("open", errno, path_);
             }
 #ifdef __linux__
             // Lock the file explicitly since we did not set O_EXLOCK
             auto flock_status = flock(fd_, LOCK_EX);
             if (!flock_status) {
-                throw io_error(errno, path_);
+                throw io_error("flock", errno, path_);
             }
 #endif
         }
@@ -137,7 +137,7 @@ namespace io {
             }
             auto written = ::writev(fd_, iov_.data(), iov_.size());
             if (written < 0) {
-                throw io_error(errno, path_);
+                throw io_error("writev", errno, path_);
             }
             iov_.clear();
             return written;
