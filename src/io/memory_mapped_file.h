@@ -45,19 +45,19 @@ namespace io {
             if (fd == -1) {
                 throw io_error("open", errno, path);
             }
-            // mmap requires file_writer length
+            // mmap requires file length
             struct stat s {};
             if (stat(path.c_str(), &s) == -1) {
                 throw io_error("stat", errno, path);
             }
             auto size = s.st_size;
-            // The file_writer size must be a multiple of the type we want in order to be valid
+            // The file size must be a multiple of the type we want in order to be valid
             if (size % sizeof(T) != 0) {
-                throw std::runtime_error(path.string() + ": invalid file_writer size");
+                throw std::runtime_error(path.string() + ": invalid file size");
             }
 
             void* dest = mmap(nullptr, size, PROT_READ, MAP_SHARED, fd, 0);
-            // The file_writer descriptor can be closed immediately after the memory has been mapped
+            // The file descriptor can be closed immediately after the memory has been mapped
             close(fd);
             if (dest == MAP_FAILED) {
                 throw io_error("mmap", errno, path);

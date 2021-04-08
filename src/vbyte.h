@@ -19,6 +19,7 @@ namespace vbyte {
         }
     }
 
+    // Kept for previous implementations (vbyteenc-ifstream.cpp and vbyteenc-ostreambufiterator.cpp)
     void encode(std::output_iterator<uint8_t> auto&& output, uint64_t i) {
         while (true) {
             uint64_t b = i % 128;

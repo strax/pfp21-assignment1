@@ -1,7 +1,6 @@
 #include <iostream>
 #include <iterator>
 #include <filesystem>
-#include <cstdio>
 
 #include "io/memory_mapped_file.h"
 #include "vbyte.h"
@@ -9,7 +8,7 @@
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        fprintf(stderr, "usage: %s file_writer\n", getprogname());
+        std::cerr << "usage: " << getprogname() << " file" << EOL;
         exit(EXIT_FAILURE);
     }
 
@@ -20,7 +19,7 @@ int main(int argc, char** argv) {
         auto it = input.begin();
         while (it != input.end()) {
             uint64_t decoded = vbyte::decode(&it);
-            std::cout << decoded << std::endl;
+            std::cout << decoded << EOL;
         }
         return EXIT_SUCCESS;
     } catch (std::exception &err) {

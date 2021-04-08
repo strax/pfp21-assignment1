@@ -57,11 +57,11 @@ namespace io {
 
     public:
         explicit file_writer(path p): path_(std::move(p)), write_buffer_(byte_buffer(pagesize)) {
-            // Open a new file_writer descriptor in write mode (O_WRONLY).
-            // * The file_writer is emptied (O_TRUNC) on opening, and if it does not exist, it is created (O_CREAT).
-            // * An exclusive lock is placed during opening the file_writer, otherwise a shared (advisory) lock is placed.
+            // Open a new file descriptor in write mode (O_WRONLY).
+            // * The file is emptied (O_TRUNC) on opening, and if it does not exist, it is created (O_CREAT).
+            // * An exclusive advisory lock is placed during opening the file
             //
-            // The permissions for the created file_writer correspond to the default permissions used by `touch`, see
+            // The permissions for the created file correspond to the default permissions used by `touch`, see
             // https://pubs.opengroup.org/onlinepubs/9699919799/utilities/touch.html
             auto oflags = O_WRONLY | O_CREAT | O_TRUNC;
 #ifdef __APPLE__
@@ -82,15 +82,15 @@ namespace io {
 
         void write(std::span<const std::byte> span) {
             if (write_buffer_.size() == 0 && span.size_bytes() >= write_buffer_.capacity()) {
-                // Optimization: bypass byte_buffer and write directly to disk
-                _write({ span });
+                // Optimization: bypass buffer and write directly to disk
+                do_write({span});
             } else if (span.size_bytes() >= write_buffer_.capacity() - write_buffer_.size()) {
-                // Since the output is larger than available space in byte_buffer, avoid copying to byte_buffer by writing
-                // byte_buffer and input
-                _write({ write_buffer_.as_span(), span });
+                // Since the output is larger than available space in buffer, avoid copying to buffer by writing
+                // buffer and input
+                do_write({write_buffer_.as_span(), span});
                 write_buffer_.reset();
             } else {
-                auto ncopied = write_buffer_.extend(span);
+                auto ncopied = write_buffer_.insert(span);
                 assert(ncopied == span.size_bytes());
             }
         }
@@ -129,11 +129,12 @@ namespace io {
         byte_buffer write_buffer_;
         std::vector<struct iovec> iov_;
 
-        size_t _write(std::initializer_list<std::span<const std::byte>> buffers) {
+        size_t do_write(std::initializer_list<std::span<const std::byte>> buffers) {
             iov_.reserve(buffers.size());
             for (const auto& buffer : buffers) {
                 iov_.emplace_back(iovec { .iov_base = (void *) buffer.data(), .iov_len = buffer.size_bytes() });
             }
+            // Use writev instead of write because we can write multiple buffers in one syscall
             auto written = ::writev(fd_, iov_.data(), iov_.size());
             if (written < 0) {
                 throw io_error("writev", errno, path_);
@@ -144,7 +145,7 @@ namespace io {
 
         void flush() {
             if (write_buffer_.size() > 0) {
-                _write({ write_buffer_.as_span() });
+                do_write({write_buffer_.as_span()});
                 write_buffer_.reset();
             }
         }

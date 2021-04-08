@@ -10,7 +10,7 @@
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        fprintf(stderr, "usage: %s file_writer\n", getprogname());
+        std::cerr << "usage: " << getprogname() << " file" << EOL;
         exit(EXIT_FAILURE);
     }
 
@@ -32,13 +32,13 @@ int main(int argc, char** argv) {
         auto compressed_size = infile.size();
         auto compression_ratio = static_cast<double>(raw_size) / compressed_size;
 
-        std::cout << "Compressed size: " << compressed_size << " bytes" << std::endl;
-        std::cout << "Raw size: " << raw_size << " bytes" << std::endl;
-        std::cout << "Compression ratio: " << compression_ratio << ":1" << std::endl;
-        std::cout << "Datum count: " << data.size() << std::endl;
-        std::cout << "Minimum: " << *std::ranges::min_element(data) << std::endl;
-        std::cout << "Maximum: " << *std::ranges::max_element(data) << std::endl;
-        std::cout << "Parse time: " << parse_time.count() << "ms" << std::endl;
+        std::cout << "Compressed size: " << compressed_size << " bytes" << EOL;
+        std::cout << "Raw size: " << raw_size << " bytes" << EOL;
+        std::cout << "Compression ratio: " << compression_ratio << ":1" << EOL;
+        std::cout << "Datum count: " << data.size() << EOL;
+        std::cout << "Minimum: " << *std::ranges::min_element(data) << EOL;
+        std::cout << "Maximum: " << *std::ranges::max_element(data) << EOL;
+        std::cout << "Parse time: " << parse_time.count() << "ms" << EOL;
 
         return EXIT_SUCCESS;
     } catch (std::exception &err) {

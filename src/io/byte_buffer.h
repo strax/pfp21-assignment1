@@ -36,7 +36,7 @@ namespace io {
             return as_span().subspan(0, pos_).end();
         }
 
-        size_t extend(std::span<const std::byte> data) noexcept {
+        size_t insert(std::span<const std::byte> data) noexcept {
             auto to_write = std::min(capacity() - size(), data.size_bytes());
             std::memmove(ptr_ + pos_, data.data(), to_write);
             pos_ += to_write;

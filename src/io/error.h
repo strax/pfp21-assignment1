@@ -26,7 +26,7 @@ namespace io {
             // NOTE: We need to construct the message here instead of `what()` because
             // `what()` returns `const char*` and we want the pointer to be valid for the lifetime
             // of the exception object
-            message_ = path_.string() + ": " + operation + ":" + code().message();
+            message_ = path_.string() + ": " + operation + ": " + code().message();
         }
 
         [[nodiscard]] const char* what() const noexcept override {

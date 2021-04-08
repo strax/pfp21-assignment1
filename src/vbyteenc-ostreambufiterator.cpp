@@ -5,17 +5,16 @@
 #include <bit>
 
 #include "io/memory_mapped_file.h"
-#include "io/file_writer.h"
 #include "vbyte.h"
 #include "utils.h"
 
-static_assert(std::endian::native == std::endian::little, "Big-endian systems are not currently supported");
+static_assert(std::endian::native == std::endian::little, "Big-endian systems are not supported");
 
 int main(int argc, char** argv) {
     std::ios_base::sync_with_stdio(false);
 
     if (argc < 2) {
-        std::cerr << "usage: " << getprogname() << " file_writer\n";
+        std::cerr << "usage: " << getprogname() << " file" << EOL;
         exit(EXIT_FAILURE);
     }
 

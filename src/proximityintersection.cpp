@@ -13,11 +13,11 @@
 
 namespace fs = std::filesystem;
 
-static_assert(std::endian::native == std::endian::little, "Big-endian systems are not currently supported");
+static_assert(std::endian::native == std::endian::little, "Big-endian systems are not supported");
 
 auto read_index_file(fs::path& path) {
     if (!fs::exists(path)) {
-        throw std::runtime_error(path.string() + ": no such file_writer");
+        throw std::runtime_error(path.string() + ": no such file");
     }
     std::ifstream file(path, std::ios::in);
     std::vector<std::pair<uint16_t, uint16_t>> pairs;
@@ -30,8 +30,7 @@ auto read_index_file(fs::path& path) {
 
 
 /// Performs proximity intersection on the given two sets \a as and \a bs with radius \a radius.
-/// Note that \a as is passed by value since it is sorted in-place whereas \a bs is passed as a const reference.
-/// This way the caller can decide whether to move \a as to this function or copy the vector beforehand.
+/// At least \a as is required to be sorted, but performance seems to be better if \b is sorted too.
 /// We use \a std::vector instead of \a std::unordered_set because vectors can be represented as contiguous memory blocks.
 std::vector<uint64_t> proximity_intersection(uint64_t radius, const std::vector<uint64_t> &as, const std::vector<uint64_t> &bs) {
     std::vector<uint64_t> matches;
@@ -53,7 +52,7 @@ auto read_compressed_set(fs::path path) {
     io::memory_mapped_file file(path);
     std::vector<uint64_t> result;
     // As vbyte-encoded values are one byte at minimum, the theoretical maximum count of values is
-    // equal to the length of the compressed file_writer.
+    // equal to the length of the compressed file.
     result.reserve(file.size());
     auto it = file.begin();
     while (it != file.end()) {
@@ -66,7 +65,7 @@ auto read_compressed_set(fs::path path) {
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        fprintf(stderr, "usage: %s radius file_writer\n", getprogname());
+        std::cerr << "usage: " << getprogname() << " radius file" << EOL;
         exit(EXIT_FAILURE);
     }
 
@@ -100,10 +99,10 @@ int main(int argc, char** argv) {
             sizes.emplace_back(result.size());
         }
         for (const auto size : sizes) {
-            std::cout << size << std::endl;
+            std::cout << size << EOL;
         }
         std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - start_time;
-        std::cout << "Total duration: " << elapsed.count() << "ms" << std::endl;
+        std::cout << "Total duration: " << elapsed.count() << "ms" << EOL;
         return EXIT_SUCCESS;
     } catch (std::exception &ex) {
         error(ex);

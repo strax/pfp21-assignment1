@@ -7,11 +7,11 @@
 #include "vbyte.h"
 #include "utils.h"
 
-static_assert(std::endian::native == std::endian::little, "Big-endian systems are not currently supported");
+static_assert(std::endian::native == std::endian::little, "Big-endian systems are not supported");
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        fprintf(stderr, "usage: %s file_writer\n", getprogname());
+        std::cerr << "usage: " << getprogname() << " file" << EOL;
         exit(EXIT_FAILURE);
     }
 
