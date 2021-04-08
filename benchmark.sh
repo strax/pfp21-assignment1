@@ -12,6 +12,5 @@ echo "** vbytedec **"
 command time -v ./bench/bench-vbytedec.sh
 echo ""
 
-rm -f files/*.vb files/*.vb.dec
 echo "** vbyteencsorted **"
 command time -v ./bench/bench-vbyteencsorted.sh
