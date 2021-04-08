@@ -4,3 +4,4 @@ cmake-build-*
 **/*.vb
 **/*.vb.dec
 testfiles/combined
+files/*
